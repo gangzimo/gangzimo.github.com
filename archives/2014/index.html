@@ -73,10 +73,10 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Pentester-Lab-Exercies---Play-Session-Injection" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2014/08/17/hello-world/" class="article-date">
-  <time datetime="2014-08-17T13:16:15.000Z" itemprop="datePublished">8月 17 2014</time>
+    <a href="/2014/08/17/Pentester-Lab-Exercies---Play-Session-Injection/" class="article-date">
+  <time datetime="2014-08-17T14:59:55.000Z" itemprop="datePublished">8月 17 2014</time>
 </a>
     
   </div>
@@ -87,7 +87,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2014/08/17/hello-world/">Hello World</a>
+      <a class="article-title" href="/2014/08/17/Pentester-Lab-Exercies---Play-Session-Injection/">Pentester Lab Exercies - Play Session Injection</a>
     </h1>
   
 
@@ -95,29 +95,77 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">trobuleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2>
-<h3 id="Create_a_new_post">Create a new post</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+        <h2 id="下载地址">下载地址</h2>
+<p><a href="http://pentesterlab.com/exercises/play_session_injection/" target="_blank" rel="external">Play Session Injection</a></p>
+<h2 id="练习目的">练习目的</h2>
+<ol>
+<li>拿到admin权限</li>
+<li>进入admin1的账户</li>
+</ol>
+<h2 id="漏洞背景">漏洞背景</h2>
+<p>此漏洞是Play framework中在2013年被发现的。漏洞详情可以参见<a href="http://www.playframework.com/security/vulnerability/20130806-SessionInjection" target="_blank" rel="external">这里</a>。</p>
+<p>Play的用户session在登录后是会被服务器返回到客户端。这样做的好处就是服务器端不用维护一个session pool，尤其当服务器是集群时无需同步，从而也减轻了服务器的负载。当然，为了防止用户在客户端篡改session，服务器会给session做一次签名。当签名的key仅仅只有服务器知道的话，用户是很难去为一个篡改的session做出正确的签名。</p>
+<p>然而，既然session是存放于客户端，潜在的攻击者必然可以去尝试不同的用户名和密码，然后观察返回的session值（类似于密码学中的chosen plaintext attack）。一旦找到了逻辑的漏洞（当然假如是开源框架，可以直接去查看源代码做代码审计），通过设计特殊的用户名和/或者密码，就可能渗透到别人的账户或者拿到更高的权限。</p>
+<h2 id="开始测试">开始测试</h2>
+<p>注册一个用户，使用test/test1作为用户名和密码。成功后，服务器会返回session信息到cookie中如下：</p>
+<p>79b8e30ff07e263d806c96500ad4ebfa9e71162d-%00___AT%3Aa79140462ce4be316e5a59dc709b7530fe8a53e9%00%00user%3Atest%00</p>
+<p>那么这个cookie是如何在服务器端被处理的呢？前往<a href="https://github.com/playframework/play1/blob/1.2.5/framework/src/play/mvc/Scope.java" target="_blank" rel="external">github</a>查看源代码！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">static Pattern sessionParser = Pattern.compile(<span class="string">"\u0000([^:]*):([^\u0000]*)\u0000"</span>);</div><div class="line">....</div><div class="line">static Session <span class="function"><span class="title">restore</span></span>() {</div><div class="line">	try {</div><div class="line">		Session session = new Session();</div><div class="line">		Http.Cookie cookie = Http.Request.current().cookies.get(COOKIE_PREFIX + <span class="string">"_SESSION"</span>);</div><div class="line">		final int duration = Time.parseDuration(COOKIE_EXPIRE) ;</div><div class="line">		final long expiration = (duration * <span class="number">1000</span>l);</div><div class="line"></div><div class="line">		<span class="keyword">if</span> (cookie != null && Play.started && cookie.value != null && !cookie.value.trim().equals(<span class="string">""</span>)) {</div><div class="line">			String value = cookie.value;</div><div class="line">			int firstDashIndex = value.indexOf(<span class="string">"-"</span>);</div><div class="line"></div><div class="line">			<span class="keyword">if</span>(firstDashIndex &gt; -<span class="number">1</span>) {</div><div class="line">				String sign = value.substring(<span class="number">0</span>, firstDashIndex);</div><div class="line">				String data = value.substring(firstDashIndex + <span class="number">1</span>);</div><div class="line"></div><div class="line">				<span class="keyword">if</span> (sign.equals(Crypto.sign(data, Play.secretKey.getBytes()))) {</div><div class="line">					String sessionData = URLDecoder.decode(data, <span class="string">"utf-8"</span>);</div><div class="line">					Matcher matcher = sessionParser.matcher(sessionData);</div><div class="line">					<span class="keyword">while</span> (matcher.find()) {</div><div class="line">						session.put(matcher.group(<span class="number">1</span>), matcher.group(<span class="number">2</span>));</div><div class="line">					}</div><div class="line">				}</div><div class="line">			}</div><div class="line">		}</div><div class="line">	}</div><div class="line">}		</div><div class="line">....</div></pre></td></tr></table></figure>
 
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+<p>可以看到服务器首先要解析cookie从中取出session（后缀是_SESSION），在这个练习中就是PLAY_SESSION。然后根据字符“-”来把session分割成为两部分：sign和data。这个sign其实就是签名，data顾名思义是存放的session值。</p>
+<p>假如签名被验证通过的话，就会用那个sessionParser正则匹配data，来生成value-key pair。此时注意到这是一个while循环，所以可以想象虽然上边的键值是(__AT,<em>*</em>)和（user, test），假如有更多的属性的话，也会被server的session正则式匹配并处理。</p>
+<p>于是攻击PoC也就很明显了，注册一个用户形如test%00%00admin%3A1的用户名，进入到正则表达式的输入值就会如下：</p>
+<table>
+<thead>
+<tr>
+<th>sep</th>
+<th>key</th>
+<th>:</th>
+<th>value</th>
+<th>sep</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%00</td>
+<td>__AT</td>
+<td>%3A</td>
+<td><em>*</em></td>
+<td>%00</td>
+</tr>
+<tr>
+<td>%00</td>
+<td>user</td>
+<td>%3A</td>
+<td><em>test</em></td>
+<td><em>%00</em></td>
+</tr>
+<tr>
+<td><em>%00</em></td>
+<td><em>admin</em></td>
+<td><em>%3A</em></td>
+<td><em>1</em></td>
+<td>%00</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，被我们“注入”了admin:1这样一个键值，于是服务器就会认为我们是admin，被赋予admin权限。那么进入admin1账户的方法也就迎刃而解了，因为注册时的用户名是admin1%00%00admin%3A1，服务器用sql查询时会认为我们是在创建新用户。但是到了session处理这一层，又被正则式过滤掉，从而进入了admin1的账户。</p>
+<p>这也是安全里常提及的：不仅要过滤输入，输出也需要注意！</p>
+<h2 id="遇到的坑">遇到的坑</h2>
+<p>题目其实很简单，但操作起来一不留神就有可能掉坑里。下边就是我碰到的一些障碍。</p>
+<h4 id="浏览器直接输入不能注入成功">浏览器直接输入不能注入成功</h4>
+<p>用Burp抓包发现，其实是被浏览器转码了，%00被转换成了%2500。</p>
+<h4 id="Burp_intercept修改request不成功">Burp intercept修改request不成功</h4>
+<p>因为header里有Content-Length属性，把%2500修改成%00长度会变短。如果直接提交给服务器，body长度不匹配会无响应。然而，删掉Content-Length也不行，因为在HTTP 1.1里假如header有Connection: Keep-alive的话，Content-Length是必须的（或者是chunk）。除非没有keep-alive，就可以不需要content-length，但另一个问题就是服务器不会注册成功（因为直接断掉了连接）。</p>
+<h4 id="Firefox插件Tamper_Data修改request不成功">Firefox插件Tamper Data修改request不成功</h4>
+<p>Tamper Data插件修改时是不需要关心Content-Length的，但需要注意的是，修改完以后一定要点离那个field，直接send出去是不被确认的。。。有些略坑。。。用hackbar就没问题了，不过前提也是先要抓到postdata的格式，然后直接load就好。</p>
+<h2 id="额外知识">额外知识</h2>
+<p>这个练习也涉及到了按字节比较的时候会产生的timing attack，以及用HMAC是为了防止length extension attack。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/08/17/hello-world/" data-id="bncjrck6evcqtoco" class="article-share-link">分享到</a>
+      <a data-url="http://yoursite.com/2014/08/17/Pentester-Lab-Exercies---Play-Session-Injection/" data-id="f9qj2mxg2v82ai4i" class="article-share-link">分享到</a>
       
       
     </footer>
@@ -154,7 +202,7 @@
       <ul>
         
           <li>
-            <a href="/2014/08/17/hello-world/">Hello World</a>
+            <a href="/2014/08/17/Pentester-Lab-Exercies---Play-Session-Injection/">Pentester Lab Exercies - Play Session Injection</a>
           </li>
         
       </ul>
