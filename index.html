@@ -73,6 +73,52 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Learning-Security-(I)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/10/15/Learning-Security-(I)/" class="article-date">
+  <time datetime="2014-10-15T07:26:12.000Z" itemprop="datePublished">10月 15 2014</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/10/15/Learning-Security-(I)/">Learning Security (I)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>学习安全知识不知不觉中已经过去了将近两个年头，在这过程中遇到了不少挑战和弯路，再加上自己要换工作了，所以写了这篇文章，也算是给自己第一阶段的总结。</p>
+<h4 id="安全不是拼技术，而是思路">安全不是拼技术，而是思路</h4>
+<p>初学安全容易碰到的一个误区就是，以为自己找不到漏洞是因为没有碰到牛逼的工具，所以花了大量的时间去尝试各种不同的工具，回过头来发现自己在一段时间内什么都没积累到。诚然，说这话可能有些绝对了，可能在这过程中我们知道了都有哪些工具可以用于哪些方向，简单的用法也都试过了。但其中最大的问题其实是：对某一类漏洞没有深刻理解的情况下，我们也没有相应的知识去理解工具背后的思路。为什么作者写了这个工具？这个工具可以用于哪些漏洞的扫描？如何评价扫描结果？在手工测试到哪种程度可以借助此工具？诸如此类，等等等等。。。</p>
+<p>就像黑哥说的，当年在腾讯漏洞响应中心和别人PK的时候，自己就是手工找漏洞的，最后轻松击败了那些用工具和他竞争的人。但是黑哥在学习的时候，遇到一个工具都会去研究它的扫描规则和适用范围，这样提高是很快的。比如，你想用某个工具的默认配置去扫描一个网站找漏洞时，那是几乎不可能的。对方难道就不会用这个工具扫自己的网站吗？你需要比别人更熟悉更了解这个工具的原理，定制或者修改某些扫描规则才可能去发掘到一些漏洞。</p>
+<p>我一直认为安全就和医生是很类似的（这也可能会解释为什么业内大牛有好些人都是医学出身，例如教主和黑哥）。不是说一个医生用了牛逼的仪器，就能说他医术多高明。名医一定是经过大量的实践，懂得怎么去使用仪器去辅助诊疗才能更快更准确的帮助病患。另外安全里的思路其实也就是相当于经验，见的漏洞多了也就形成了自己独特的安全对抗理论。对应于医生也一样，一个医学的学习可能和一个老医生的知识差不多，但他／她却不能像老医生一样灵活自如的根据每个人的具体情况来治疗。还有的就是，当一个好的安全从业者（尤其是白帽）和当一名好的医生一样，都要对自己的职业有着强烈的责任感。一个是救死扶伤，保护大家的生命；一个是捍卫系统／软件安全，保护虚拟世界。再多说一点的就是，安全与医学一样是人与人的对抗。程序说到底都是人写的，人不是机器，总有犯错，总有状态的起起伏伏，反应到代码当然会有疏漏产生。当然，有些漏洞是直观明了，某个地方很明显是遗漏了；而另一些漏洞则是建立在体系／流程的基础上，由一系列看起来不起眼的不足串联成一个重大失误。这就需要安全从业者多思考多分析，不要一头扎到技术中出不来，或许一些人文类的心理类的书籍反而能带来一些新的攻击／防御思路。</p>
+<h4 id="安全学习不能急功近利，打牢基础再上路">安全学习不能急功近利，打牢基础再上路</h4>
+<p>我认为第一阶段的学习一定要把基础知识打牢，针对某个方向的学习必须学透学精。另外，因为我是研究移动客户端的安全，所以在研究漏洞前必须要先去学习Android或者iOS的开发。不懂编程会极大的阻碍后期的深入研究，遇到学习的瓶颈。另一个需要注意的是，学习不能仅限于书本知识，要多做练习多实践。幸好我们现在处于互联网时代，查找练习资源和相关的论坛都特别方便。假如连搜索引擎的关键字设计都做不好的话，真的可以放弃了，这个不适合。。。</p>
+<p>在开发知识学完以后进入到安全知识的学习时，要一个点一个点的慢慢来，想要求大求全是绝对不可能的。哪怕是现在这些行业内的大牛，也没人可以说我哪个方向都非常牛逼，每个人都有自己擅长的领域。其实把某个方向学到极致，别的也就会更容易领悟，殊途同归／高屋建瓴的感觉吧。一开始就追求大而全的结果可能是什么都蜻蜓点水，什么都不精通。看似花了很多时间，但一旦独立的去找漏洞／做防御的时候发现好像无从下手的感觉。</p>
+<p>另外，学习安全的另一个容易疏漏的地方就是：非常high的去实践各种攻击手段，而忽视了后边的防御体系。我们做安全白帽子的主要目的就是为了维护企业安全，而不是去主动攻击谁、破坏谁。所以，当学习了一种攻击手法的时候，同时要思考为什么这个地方会被攻击到，我可以用什么技术手段或者流程规范来防止和抵御这种攻击。然后，再去尝试绕过这个防御，进而再去反思还有什么疏漏。这样经过反复的锤炼后，相信大家都能对某一个点的攻击和防御都有一个很深的理解。</p>
+<p>需要提醒的一点是，每种攻击手法都需要注意到它的应用场景，去综合考量潜在的损失。假如要求非常苛刻，同时信息又不是那么敏感，那么我们可能会考虑优先把时间分配给那些相对较弱的点去优先防护。看起来和上边要求的先把某个点精通熟悉优先是矛盾的，但实际上这里要强调的就是一个度的问题。比如公司很大，每个方向都有很多人去做，那么我们当然可以把一个点吃的非常透非常深入，因为我们有充足的资源去做；但假如资源有限，而业务要求又比较急迫，那么我们可以考虑是不是先做到某个程度就够。因为从理论上说，没有任何东西是绝对安全的。那么需要思考的就是，这个产品我们需要保护到什么程度就够了，让潜在的高级攻击者丧失兴趣，同时又能防住一般的攻击者。当然，我自己也是刚刚做安全不久，需要继续在这个行业的积累和思考。目前理解的程度在大牛眼里可能还是非常浅薄吧。。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/10/15/Learning-Security-(I)/" data-id="rmsl9kpgqpww5mms" class="article-share-link">分享到</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Pentester-Lab-Exercies---Play-Session-Injection" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2014/08/17/Pentester-Lab-Exercies---Play-Session-Injection/" class="article-date">
@@ -190,7 +236,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08">August 2014</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">October 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08">August 2014</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -200,6 +246,10 @@
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2014/10/15/Learning-Security-(I)/">Learning Security (I)</a>
+          </li>
         
           <li>
             <a href="/2014/08/17/Pentester-Lab-Exercies---Play-Session-Injection/">Pentester Lab Exercies - Play Session Injection</a>
